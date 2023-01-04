@@ -74,9 +74,15 @@ class _HomePageState extends State<HomePage> {
           return DialogBox(
             controller: controller,
             onSave: saveNewTask,
-            onCancel: () => Navigator.of(context).pop(),
+            onCancel: () {
+              setState(() {
+                controller.clear();
+                Navigator.of(context).pop();
+              });
+            },
           );
         });
+    toDoDatabase.updateDataBase();
   }
 
   // delete task
@@ -153,7 +159,7 @@ class _HomePageState extends State<HomePage> {
       behavior: SnackBarBehavior.floating,
       elevation: 0.0,
       margin: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0),
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 1),
       content: const Text(
         'Task deleted',
         style: TextStyle(
