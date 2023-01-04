@@ -125,7 +125,7 @@ class _HomePageState extends State<HomePage> {
             ? const Center(
                 child: Text(
                   'No task added ',
-                  style: TextStyle(fontSize: 20),
+                  style: TextStyle(fontSize: 20, fontFamily: 'San Francisco'),
                 ),
               )
             : ListView.builder(
@@ -154,6 +154,7 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8.0),
+        side: const BorderSide(color: Colors.black),
       ),
       padding: const EdgeInsets.all(15.0),
       behavior: SnackBarBehavior.floating,
@@ -164,6 +165,7 @@ class _HomePageState extends State<HomePage> {
         'Task deleted',
         style: TextStyle(
           fontSize: 16.0,
+          fontFamily: 'San Francisco',
           color: Colors.black,
         ),
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:todo_app/pages/home_page.dart';
+import 'package:todo_app/pages/login_pade.dart';
 
 void main() async {
   // initialize the hive
@@ -23,7 +24,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
       ),
-      home: const HomePage(),
+      home: const LoginPage(),
     );
   }
 }
