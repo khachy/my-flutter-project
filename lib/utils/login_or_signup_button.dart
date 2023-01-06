@@ -24,9 +24,11 @@ class LoginOrSignUpButton extends StatelessWidget {
           child: Text(
             buttonName,
             style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 16.0),
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'San Francisco',
+              fontSize: 20.0,
+            ),
           ),
         ),
       ),

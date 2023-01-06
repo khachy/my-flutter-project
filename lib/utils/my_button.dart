@@ -13,9 +13,15 @@ class MyButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialButton(
+      elevation: 0.0,
+      padding: const EdgeInsets.all(12.0),
       onPressed: onpressed,
       color: Theme.of(context).primaryColor,
-      child: Text(buttonName),
+      textColor: Colors.white,
+      child: Text(
+        buttonName,
+        style: TextStyle(fontFamily: 'San Francisco', fontSize: 16.0),
+      ),
     );
   }
 }
