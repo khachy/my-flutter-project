@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:todo_app/data/database.dart';
 import 'package:todo_app/utils/dialog_box.dart';
+import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import '../utils/loader.dart';
 import '../utils/todo_tile.dart';
 
 class HomePage extends StatefulWidget {
@@ -14,6 +17,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  // bool isLoading = false;
+
   // reference the hive box
   final myBox = Hive.box('myBox');
   ToDoDatabase toDoDatabase = ToDoDatabase();
@@ -23,7 +28,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
 
     if (myBox.get('TODOLIST') != null) {
-      // data already exists
+      // load the data from the database
       toDoDatabase.loadData();
     }
   }
@@ -37,6 +42,20 @@ class _HomePageState extends State<HomePage> {
       toDoDatabase.toDoList[index][1] = !toDoDatabase.toDoList[index][1];
     });
     toDoDatabase.updateDataBase();
+  }
+
+  // get current user
+  final user = FirebaseAuth.instance.currentUser;
+
+  // sign user out
+  void signUserOut() async {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return const Loader(text: 'LOGGING OUT...');
+        });
+    FirebaseAuth.instance.signOut();
+    Navigator.of(context).pop();
   }
 
   // save new task
@@ -102,7 +121,7 @@ class _HomePageState extends State<HomePage> {
     toDoDatabase.updateDataBase();
   }
 
-  bool emptyToDoList() {
+  bool emptyTODOLIST() {
     return toDoDatabase.toDoList.isEmpty;
   }
 
@@ -111,6 +130,12 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Colors.deepPurple[100],
       appBar: AppBar(
+        actions: [
+          IconButton(
+            onPressed: signUserOut,
+            icon: Icon(Icons.logout),
+          ),
+        ],
         title: const Text('TO DO LIST'),
         centerTitle: true,
         elevation: 0.0,
@@ -122,11 +147,11 @@ class _HomePageState extends State<HomePage> {
         child: const Icon(Icons.add),
       ),
       body: Builder(builder: (context) {
-        return emptyToDoList()
-            ? const Center(
+        return emptyTODOLIST()
+            ? Center(
                 child: Text(
-                  'No task added ',
-                  style: TextStyle(fontSize: 20, fontFamily: 'San Francisco'),
+                  'No task added',
+                  style: TextStyle(fontFamily: 'San Francisco', fontSize: 20),
                 ),
               )
             : ListView.builder(
@@ -138,10 +163,19 @@ class _HomePageState extends State<HomePage> {
                     onChanged: (value) => checkBoxChanged(value, index),
                     deleteFunction: (context) {
                       setState(() {
-                        var item = toDoDatabase.toDoList[index];
+                        // var item = toDoDatabase.toDoList[index];
                         deleteTask(index);
-                        // show a snackbar
-                        showActionSnackBar(context, item, index);
+
+                        // show a toast message
+                        Fluttertoast.showToast(
+                          msg: 'Deleted Successfully',
+                          backgroundColor: Colors.redAccent,
+                          textColor: Colors.white,
+                          fontSize: 18,
+                          gravity: ToastGravity.SNACKBAR,
+                        );
+                        // show a snackBar
+                        // showActionSnackBar(context, item, index);
                       });
                     },
                   );
@@ -150,35 +184,27 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void showActionSnackBar(context, item, index) {
-    final snackBar = SnackBar(
-      backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8.0),
-        side: const BorderSide(color: Colors.black),
-      ),
-      padding: const EdgeInsets.all(15.0),
-      behavior: SnackBarBehavior.floating,
-      elevation: 0.0,
-      margin: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0),
-      duration: const Duration(seconds: 1),
-      content: const Text(
-        'Task deleted',
-        style: TextStyle(
-          fontSize: 16.0,
-          fontFamily: 'San Francisco',
-          color: Colors.black,
-        ),
-      ),
-      action: SnackBarAction(
-          label: 'UNDO',
-          onPressed: () {
-            undoDelete(index, item);
-          }),
-    );
-
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(snackBar);
-  }
+  // void showActionSnackBar(context, item, index) {
+  //   final snackBar = SnackBar(
+  //     elevation: 0.0,
+  //     duration: const Duration(seconds: 2),
+  //     shape: RoundedRectangleBorder(
+  //       borderRadius: BorderRadius.circular(8.0),
+  //       side: const BorderSide(color: Colors.black),
+  //     ),
+  //     padding: const EdgeInsets.all(15.0),
+  //     margin: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 30.0),
+  //     behavior: SnackBarBehavior.floating,
+  //     backgroundColor: Colors.white,
+  //     content: Text('Task deleted', style: TextStyle(color: Colors.black)),
+  //     action: SnackBarAction(
+  //       label: 'UNDO',
+  //       textColor: Colors.blue,
+  //       onPressed: () => undoDelete(index, item),
+  //     ),
+  //   );
+  //   ScaffoldMessenger.of(context)
+  //     ..hideCurrentSnackBar()
+  //     ..showSnackBar(snackBar);
+  // }
 }

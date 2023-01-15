@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-class SquareTile extends StatelessWidget {
+class CircleTile extends StatelessWidget {
   final String image;
-  const SquareTile({
+  const CircleTile({
     super.key,
     required this.image,
   });

@@ -1,8 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:todo_app/pages/auth_page.dart';
 import 'package:todo_app/pages/home_page.dart';
 import 'package:todo_app/pages/login_page.dart';
+import 'package:todo_app/pages/verification_page.dart';
 import 'package:todo_app/utils/loader.dart';
 
 import 'firebase_options.dart';
@@ -33,7 +35,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
       ),
-      home: const LoginPage(),
+      home: AuthPage(),
     );
   }
 }

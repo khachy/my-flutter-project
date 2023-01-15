@@ -2,36 +2,35 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:todo_app/pages/forgot_password_page.dart';
-import 'package:todo_app/utils/loader.dart';
+import 'package:todo_app/pages/home_page.dart';
+import 'package:todo_app/pages/verification_page.dart';
 import 'package:todo_app/utils/login_or_signup_button.dart';
 import 'package:todo_app/utils/email_textfield.dart';
 import 'package:todo_app/utils/circle_tile.dart';
 import 'package:todo_app/utils/password_textfield.dart';
 
-class LoginPage extends StatefulWidget {
+import '../utils/loader.dart';
+
+class RegisterPage extends StatefulWidget {
   void Function()? onTap;
-  LoginPage({
+  RegisterPage({
     super.key,
     required this.onTap,
   });
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   final formKey = GlobalKey<FormState>();
   bool isClicked = false;
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  // sign in method
-  void signUserIn() async {
+  // sign up method
+  void signUserUp() async {
     showDialog(
       context: context,
       builder: (context) {
@@ -39,19 +38,30 @@ class _LoginPageState extends State<LoginPage> {
       },
     );
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailController.text,
-        password: passwordController.text,
-      );
+      // check if passwords are the same
+      if (passwordController.text == confirmPasswordController.text) {
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: emailController.text,
+          password: passwordController.text,
+        );
+      } else {
+        // show error message, passwords don't match
+        Fluttertoast.showToast(msg: 'Passwords don\'t match', 
+        fontSize: 18,
+         backgroundColor: Colors.blueAccent, 
+         textColor: Colors.white,
+         );
+      }
       Navigator.pop(context);
 
       // validate the form
       formKey.currentState?.validate();
     } on FirebaseAuthException catch (error) {
+      Navigator.pop(context);
       // show error message
       Fluttertoast.showToast(
           msg: error.message.toString(),
-          fontSize: 18,
+          fontSize: 16,
           gravity: ToastGravity.SNACKBAR,
           backgroundColor: Colors.blue);
     }
@@ -83,14 +93,14 @@ class _LoginPageState extends State<LoginPage> {
                 // LOGO
                 Image.asset(
                   'assets/list.png',
-                  height: 70,
+                  height: 50,
                 ),
 
                 const SizedBox(height: 30),
 
-                // WELCOME BACK TEXT
+                // LET'S GET STARTED TEXT
                 Text(
-                  "Welcome Back, you've been missed",
+                  "Let's get started!",
                   style: TextStyle(
                       fontSize: 16,
                       fontFamily: 'San Francisco',
@@ -107,6 +117,8 @@ class _LoginPageState extends State<LoginPage> {
                   hintText: 'e.g example@gmail.com',
                   maxLength: 50,
                 ),
+
+                // PASSWORD TEXTFORMFIELD
                 PasswordFormField(
                   controller: passwordController,
                   labelText: 'Password',
@@ -117,39 +129,23 @@ class _LoginPageState extends State<LoginPage> {
                   onTap: iconTapped,
                 ),
 
-                // FORGOT PASSWORD TEXT
-                GestureDetector(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          'Forgot Password?',
-                          style: TextStyle(
-                            color: Colors.blue,
-                            fontSize: 16.0,
-                            fontFamily: 'San Francisco',
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                      return ForgotPasswordPage();
-                    }));
-                  },
+                // CONFIRM PASSWORD TEXTFORMFIELD
+                PasswordFormField(
+                  controller: confirmPasswordController,
+                  labelText: 'Confirm Password',
+                  obscureText: !isClicked ? true : false,
+                  hintText: 'e.g Qwerty1234',
+                  maxLength: 15,
+                  iconData: isClicked ? Icons.visibility : Icons.visibility_off,
+                  onTap: iconTapped,
                 ),
 
-                const SizedBox(height: 25.0),
+                const SizedBox(height: 20.0),
 
                 // LOGIN OR SIGN UP BUTTON
                 LoginOrSignUpButton(
-                  onTap: signUserIn,
-                  buttonName: 'Continue',
+                  onTap: signUserUp,
+                  buttonName: 'Register',
                 ),
 
                 const SizedBox(height: 50.0),
@@ -184,12 +180,12 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 20),
 
                 // GOOGLE SIGN IN
                 CircleTile(image: 'assets/google-logo.png'),
                 const SizedBox(
-                  height: 35,
+                  height: 20,
                 ),
 
                 // REGISTER NOW TEXT
@@ -197,7 +193,7 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Not a member?',
+                      'Already have an account?',
                       style: TextStyle(
                           color: Colors.grey[700], fontFamily: 'San Francisco'),
                     ),
@@ -207,7 +203,7 @@ class _LoginPageState extends State<LoginPage> {
                     GestureDetector(
                       onTap: widget.onTap,
                       child: Text(
-                        'Register now',
+                        'Sign in',
                         style: TextStyle(
                           color: Colors.blue,
                           fontSize: 16.0,
